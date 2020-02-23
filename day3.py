@@ -33,54 +33,65 @@ Repeat for WireB in circuitB
 Check circuitA against circuitB: if they contain the same co-ords at any point, store in list "cross"
 When adding an item to cross, also store its Manhattan distance to the centre by taking sum of the absolute values of the co-ordinates
 Sort cross by Manhattan values and return the lowest to answer part 1 of puzzle
+Part 2 requires the distance from the start point - "d" - to be counted
+THis distance must be rest if the wire passes back through the start point
 """
 circuitA = []
 circuitB = []
 cross = []
 def place_wire(wire,circuit):
     pos = [0,0]
+    d = 0
     for w in wire:
         x = pos[0]
         y = pos[1]
         if w[0] == "U":
             while y < (pos[1] + w[1]):
                 y +=1
+                d += 1
                 if pos[0] == 0 and pos[1] == 0:
                     continue
                 else:
-                    circuit.append([x,y])
+                    circuit.append([x,y,d])
             pos[1] += w[1]
         elif w[0] == "D":
             while y > (pos[1] - w[1]):
                 y -=1
+                d += 1
                 if pos[0] == 0 and pos[1] == 0:
                     continue
                 else:
-                    circuit.append([x,y])
+                    circuit.append([x,y,d])
             pos[1] -= w[1]
         elif w[0] == "R":
             while x < (pos[0] + w[1]):
                 x +=1
+                d += 1
                 if pos[0] == 0 and pos[1] == 0:
                     continue
                 else:
-                    circuit.append([x,y])
+                    circuit.append([x,y,d])
             pos[0] += w[1]
         elif w[0] == "L":
             while x > (pos[0] - w[1]):
                 x -=1
+                d += 1
                 if pos[0] == 0 and pos[1] == 0:
                     continue
                 else:
-                    circuit.append([x,y])
+                    circuit.append([x,y,d])
             pos[0] -= w[1]
         else:
             sys.exit("Direction in wire A not recognised: " + str(wire[0]))
 place_wire(wireA,circuitA)
 place_wire(wireB,circuitB)
-for coord in circuitA:
-    if coord in circuitB:
-        man = abs(coord[0])+abs(coord[1])
-        cross.append([coord[0],coord[1],man])
+for coordA in circuitA:
+    for coordB in circuitB:
+        if coordA[0] == coordB[0] and coordA[1] == coordB[1]:
+            man = abs(coordA[0])+abs(coordA[1])
+            dTotal = coordA[2] + coordB[2]
+            cross.append([coordA[0],coordA[1],man,dTotal])
 cross.sort(key = lambda x: x[2])
 print("The answer to part 1 is " + str(cross[0][2]))
+cross.sort(key = lambda x: x[3])
+print("The answer to part 2 is " + str(cross[0][3]))
